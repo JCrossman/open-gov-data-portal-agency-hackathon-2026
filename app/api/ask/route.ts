@@ -3,10 +3,14 @@ import { query } from "@/lib/db";
 import { T3010_METRIC_SCHEMA_NOTE } from "@/lib/metrics";
 import { DefaultAzureCredential } from "@azure/identity";
 
-const AZURE_OPENAI_ENDPOINT =
-  process.env.AZURE_OPENAI_ENDPOINT ?? (() => { throw new Error("AZURE_OPENAI_ENDPOINT env var is required"); })();
 const AZURE_OPENAI_DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT ?? "gpt-41";
 const AZURE_OPENAI_API_VERSION = "2024-08-01-preview";
+
+function getAzureOpenAIEndpoint(): string {
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  if (!endpoint) throw new Error("AZURE_OPENAI_ENDPOINT env var is required");
+  return endpoint;
+}
 
 const SCHEMA = `
 Tables and columns (PostgreSQL):
@@ -92,7 +96,7 @@ async function generateSQL(
   history: { question: string; sql: string }[] = [],
 ): Promise<{ sql: string; hint: ChartHint | null }> {
   const token = await getAzureOpenAIToken();
-  const url = `${AZURE_OPENAI_ENDPOINT}/openai/deployments/${AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=${AZURE_OPENAI_API_VERSION}`;
+  const url = `${getAzureOpenAIEndpoint()}/openai/deployments/${AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=${AZURE_OPENAI_API_VERSION}`;
 
   const messages: { role: string; content: string }[] = [
     { role: "system", content: SYSTEM_PROMPT },

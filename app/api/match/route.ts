@@ -2,16 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { DefaultAzureCredential } from "@azure/identity";
 
-const AZURE_OPENAI_ENDPOINT =
-  process.env.AZURE_OPENAI_ENDPOINT ?? (() => { throw new Error("AZURE_OPENAI_ENDPOINT env var is required"); })();
 const EMBEDDING_DEPLOYMENT = "text-embedding-3-small";
 const EMBEDDING_DIMENSIONS = 256;
 const API_VERSION = "2024-08-01-preview";
 
+function getAzureOpenAIEndpoint(): string {
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  if (!endpoint) throw new Error("AZURE_OPENAI_ENDPOINT env var is required");
+  return endpoint;
+}
+
 async function getEmbedding(text: string): Promise<number[]> {
   const credential = new DefaultAzureCredential();
   const token = await credential.getToken("https://cognitiveservices.azure.com/.default");
-  const url = `${AZURE_OPENAI_ENDPOINT}/openai/deployments/${EMBEDDING_DEPLOYMENT}/embeddings?api-version=${API_VERSION}`;
+  const url = `${getAzureOpenAIEndpoint()}/openai/deployments/${EMBEDDING_DEPLOYMENT}/embeddings?api-version=${API_VERSION}`;
 
   const response = await fetch(url, {
     method: "POST",
