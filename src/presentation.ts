@@ -671,7 +671,7 @@ function formatCellValue(value: TableCellValue): string {
 }
 
 function escapeMarkdownCell(value: string): string {
-  return value.replace(/\|/g, "\\|");
+  return value.replace(/[\\|]/g, "\\$&");
 }
 
 function formatNumber(value: number): string {

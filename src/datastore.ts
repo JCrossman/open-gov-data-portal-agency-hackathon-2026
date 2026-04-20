@@ -182,7 +182,7 @@ function formatCell(value: unknown): string {
     return str.substring(0, 49) + "…";
   }
 
-  return str.replace(/\|/g, "\\|");
+  return str.replace(/[\\|]/g, "\\$&");
 }
 
 function formatCount(value: number): string {
