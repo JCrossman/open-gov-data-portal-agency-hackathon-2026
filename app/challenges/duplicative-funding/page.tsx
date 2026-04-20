@@ -1,4 +1,4 @@
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 import { queryWithStatus, querySafe } from "@/lib/db";
 import DataUnavailableBanner from "@/components/DataUnavailableBanner";
 import { POLICY_COMMITMENTS } from "@/lib/policy-commitments";

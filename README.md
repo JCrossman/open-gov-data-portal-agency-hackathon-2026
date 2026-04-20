@@ -31,6 +31,29 @@ Each challenge has its own page that surfaces the top findings from
 pre-computed materialized views; an AI chat (`/ask`) lets users explore the
 underlying data conversationally.
 
+### Additional capabilities
+
+- **Conversational Ask-the-Data** (`/ask`) — natural-language questions → GPT-4.1
+  generates SQL → live database → findings rendered as cards + charts + follow-up
+  suggestions. Streams tokens via SSE, remembers conversation context, and offers
+  an **Investigate Mode** that pivots a suggested question into a deeper
+  challenge-level analysis.
+- **Self-healing AI retry** — when GPT's SQL fails, the server queries
+  `information_schema.columns` for the referenced tables and feeds real schema
+  back to the model (up to two retries) so hallucinated column names and type
+  mistakes are caught and corrected automatically.
+- **Bilingual EN / FR site-wide** — a single header toggle translates every page,
+  AI response, chart label, and tooltip on the fly. French-mode Ask queries work
+  end to end.
+- **Access-code login screen** (`/access`) — users without a code see a clean,
+  accessible entry form instead of a raw 401.
+- **Entity profile pages** (`/entity/[name]`) — one URL per recipient that
+  cross-references contracts, grants, T3010 filings, directors, transfers, and
+  adverse media.
+- **Daily briefing, shareable findings, and text-to-speech** — `/api/briefing`,
+  `/api/share`, and `/api/tts` turn standout findings into narrated summaries and
+  signed shareable links.
+
 ---
 
 ## Architecture
@@ -50,9 +73,10 @@ underlying data conversationally.
 
 ### Stack
 
-- **Web**: [Next.js 16](https://nextjs.org) (App Router, RSC, ISR), TypeScript, [Recharts](https://recharts.org)
+- **Web**: [Next.js 16](https://nextjs.org) (App Router, RSC, force-dynamic rendering on DB-backed pages), TypeScript, [Recharts](https://recharts.org)
 - **Database**: PostgreSQL 16 + [pgvector](https://github.com/pgvector/pgvector)
-- **AI**: Azure OpenAI (GPT-4.1 for natural-language → SQL, `text-embedding-3-small` for fuzzy entity matching)
+- **AI**: Azure OpenAI (GPT-4.1 for natural-language → SQL and on-the-fly translation, `text-embedding-3-small` for fuzzy entity matching)
+- **Bilingual**: `components/AutoTranslate.tsx` + `/api/translate` wrap server-rendered content; `lib/i18n.ts` + `lib/lang.ts` persist the user's language choice
 - **Tests**: [Playwright](https://playwright.dev) audit suite
 - **Hosting**: Azure Container Apps + Azure Container Registry
 - **MCP server**: `src/index.ts` ships an stdio MCP server with 22 tools and 10 prompt templates for Claude Desktop
@@ -73,10 +97,13 @@ underlying data conversationally.
 ## Repository layout
 
 ```
-app/                 Next.js routes (challenge pages, /ask, API routes)
-components/          UI components (charts, navigation, banner)
-lib/                 Database client, metrics, chart selection
-scripts/             ETL, materialized-view definitions, embeddings, ingest
+app/                 Next.js routes (challenge pages, /ask, /access, /share, API routes)
+components/          UI components (charts, navigation, SiteHeader, AutoTranslate,
+                     LanguageToggle, banner)
+lib/                 Database client, metrics, chart selection, i18n/lang helpers,
+                     ask-stream SSE helper
+scripts/             ETL, materialized-view definitions, embeddings, ingest,
+                     backfill-french-descriptions
 src/                 MCP server (Claude Desktop integration)
 tests/audit/         Playwright tests that assert challenge findings
                      against the underlying tables
@@ -144,6 +171,10 @@ source. A few rules baked into the codebase:
   re-derive the same metric with different logic.
 - **BN matching uses 9-digit prefix** (`substr(bn, 1, 9)`) to bridge name
   variations between the grants table and T3010 filings.
+- **BN column names are inconsistent across tables** (this is a permanent schema
+  gotcha): `grants.recipient_business_number` (long form) vs.
+  `adverse_media_matches.bn`, `t3010_*.bn`, and all `mv_*` MVs (short form);
+  `t3010_transfers` uses `donor_bn` / `donee_bn`; `contracts` has no BN column.
 - **The misleadingly-named CRA T3010 columns** `gov_funding_provincial` (Line
   4130 = investment income) and `gov_funding_other` (Line 4140 = other revenue)
   are **not** government funding. Only Line 4120 (`gov_funding_federal`)
@@ -152,6 +183,9 @@ source. A few rules baked into the codebase:
 - **Public-sector entities** (universities, health authorities, government
   departments) are explicitly excluded from "ghost" and "zombie" findings via
   name-pattern filters in the MV definitions.
+- **DB-backed pages render per request.** Pages that query the database use
+  `export const dynamic = "force-dynamic"` — ISR is intentionally disabled on
+  data-driven views to prevent build-time errors from being cached for an hour.
 
 ---
 

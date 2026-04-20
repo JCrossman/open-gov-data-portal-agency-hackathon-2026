@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { cookies, headers } from "next/headers";
 import "./globals.css";
-import MainNav from "@/components/MainNav";
+import { LangProvider } from "@/lib/lang";
+import { pickLang } from "@/lib/i18n";
+import SiteHeader from "@/components/SiteHeader";
+import AutoTranslate from "@/components/AutoTranslate";
 import AskAIBanner from "@/components/AskAIBanner";
 
 export const metadata: Metadata = {
@@ -9,66 +13,57 @@ export const metadata: Metadata = {
     "Government of Canada Open Data Accountability Platform - querying 3M+ federal records for transparency and accountability.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const hdrs = await headers();
+  const lang = pickLang(
+    cookieStore.get("lang")?.value,
+    hdrs.get("accept-language")
+  );
+
   return (
-    <html lang="en">
+    <html lang={lang}>
       <body>
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
+        <LangProvider initialLang={lang}>
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
 
-        <header
-          style={{
-            background: "var(--gc-primary)",
-            color: "white",
-            padding: "0.75rem 1.5rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <span style={{ fontSize: "1.5rem" }} aria-hidden="true">
-              🍁
-            </span>
-            <span style={{ fontWeight: 700, fontSize: "1.125rem" }}>
-              Open Data Accountability Platform
-            </span>
-          </div>
-          <MainNav />
-        </header>
+          <SiteHeader />
+          <AskAIBanner />
 
-        <AskAIBanner />
+          <main id="main-content">{children}</main>
 
-        <main id="main-content">{children}</main>
-
-        <footer
-          style={{
-            borderTop: "1px solid var(--gc-border)",
-            padding: "1rem 1.5rem",
-            color: "var(--gc-text-secondary)",
-            fontSize: "0.875rem",
-            textAlign: "center",
-            marginTop: "2rem",
-          }}
-        >
-          Data sourced from{" "}
-          <a
-            href="https://open.canada.ca"
+          <footer
             style={{
-              color: "#0b3d68",
-              textDecoration: "underline",
-              fontWeight: 600,
+              borderTop: "1px solid var(--gc-border)",
+              padding: "1rem 1.5rem",
+              color: "var(--gc-text-secondary)",
+              fontSize: "0.875rem",
+              textAlign: "center",
+              marginTop: "2rem",
             }}
           >
-            open.canada.ca
-          </a>{" "}
-          - Government of Canada Open Data Portal
-        </footer>
+            Data sourced from{" "}
+            <a
+              href="https://open.canada.ca"
+              style={{
+                color: "#0b3d68",
+                textDecoration: "underline",
+                fontWeight: 600,
+              }}
+            >
+              open.canada.ca
+            </a>{" "}
+            - Government of Canada Open Data Portal
+          </footer>
+
+          <AutoTranslate />
+        </LangProvider>
       </body>
     </html>
   );

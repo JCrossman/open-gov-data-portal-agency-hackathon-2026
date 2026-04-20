@@ -1,14 +1,24 @@
 import pg from "pg";
 
-const DATABASE_URL =
-  process.env.DATABASE_URL ??
+const RAW_DATABASE_URL = process.env.DATABASE_URL;
+// Only used as a last-resort placeholder so that Next.js type-checking and
+// build-time imports don't crash. If this value is ever actually handed to
+// pg.Pool, getPool() throws below — we never do DNS on the literal "HOST".
+const PLACEHOLDER_URL =
   "postgresql://USER:PASSWORD@HOST:5432/DBNAME?sslmode=require";
+const DATABASE_URL = RAW_DATABASE_URL ?? PLACEHOLDER_URL;
 
 // Connection pool (reused across requests in Next.js)
 let pool: pg.Pool | null = null;
 
 export function getPool(): pg.Pool {
   if (!pool) {
+    if (!RAW_DATABASE_URL || DATABASE_URL === PLACEHOLDER_URL) {
+      throw new Error(
+        "DATABASE_URL is not configured. Set it in the runtime environment; " +
+          "do not attempt to connect using the placeholder connection string."
+      );
+    }
     pool = new pg.Pool({
       connectionString: DATABASE_URL,
       max: 10,

@@ -1,4 +1,4 @@
-export const revalidate = 3600; // ISR: revalidate every hour
+export const dynamic = "force-dynamic";
 import { queryWithStatus } from "@/lib/db";
 import DataUnavailableBanner from "@/components/DataUnavailableBanner";
 import { parseSort } from "@/lib/sort-params";

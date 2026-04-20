@@ -40,6 +40,30 @@
   }
 }
 
+/* Hide body content while the first French translation pass is in-flight to
+   prevent an English→French flash. The attribute is set by AutoTranslate
+   and removed as soon as the initial batch of strings is replaced. */
+html[data-translating="true"] body > *:not(script):not(style) {
+  visibility: hidden;
+}
+html[data-translating="true"] body::before {
+  content: "Traduction en cours…";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  visibility: visible;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--gc-text-secondary);
+  background: white;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--gc-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  z-index: 9999;
+}
+
 body {
   font-family: var(--font-body);
   color: var(--gc-text);

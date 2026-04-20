@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { querySafe } from "@/lib/db";
 import { ADVERSE_MEDIA_SEVERITIES } from "@/lib/adverse-media";
