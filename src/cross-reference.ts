@@ -265,7 +265,7 @@ function norm(value: unknown): string {
 }
 
 function trunc(value: string, max: number): string {
-  const v = value.replace(/\|/g, "\\|");
+  const v = value.replace(/[\\|]/g, "\\$&");
   return v.length <= max ? v : v.substring(0, max - 1) + "…";
 }
 

@@ -87,7 +87,7 @@ function detectMultiBoard(directors: DirectorRecord[]): DirectorSearchResult["mu
   return Array.from(byName.entries())
     .filter(([, boards]) => boards.length >= 2)
     .map(([key, boards]) => ({
-      name: key.replace("|", ", "),
+      name: key.replace(/\|/g, ", "),
       boards,
     }));
 }

@@ -197,10 +197,10 @@ function describeSolicitation(code: string): string {
 
 function truncate(value: string, max: number): string {
   if (value.length <= max) {
-    return value.replace(/\|/g, "\\|");
+    return value.replace(/[\\|]/g, "\\$&");
   }
 
-  return (value.substring(0, max - 1) + "…").replace(/\|/g, "\\|");
+  return (value.substring(0, max - 1) + "…").replace(/[\\|]/g, "\\$&");
 }
 
 function formatCount(value: number): string {
