@@ -1,0 +1,58 @@
+node_modules/
+dist/
+
+.next
+next-env.d.ts
+
+# build artifacts
+build/
+out/
+*.tsbuildinfo
+
+# test artifacts
+test-results/
+playwright-report/
+audit-results.json
+audit-*.log
+
+# environment
+.env
+.env.local
+.env.*.local
+.env.production
+
+# editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# session-state and internal planning
+.copilot/
+.claude/
+
+# internal project artifacts (not for public repo)
+CLAUDE.md
+HANDOFF.md
+ChallengePrompts.md
+HackathonChallengeDemo.docx
+audit-final-v3.md
+demo_output_*.md
+
+# throwaway diagnostic scripts (one-off exploration, not part of the product)
+analyze-mv.mjs
+check-counts.mjs
+check-mv-def.cjs
+check-schema.mjs
+check-table-counts.cjs
+check-tables.cjs
+check-views.cjs
+
+# data dumps (large; not for source control)
+data/

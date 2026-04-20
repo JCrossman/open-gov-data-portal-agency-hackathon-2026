@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+data
+*.md
+*.docx
+demo_output_*
+.git
+.gitignore
+scripts
+src/**/*.test.ts

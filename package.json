@@ -1,0 +1,57 @@
+{
+  "name": "opengovdataportal",
+  "version": "1.5.0",
+  "description": "MCP server for Open Government Portal dataset search and raw resource access",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "opengovdataportal": "dist/index.js"
+  },
+  "scripts": {
+    "build:mcp": "tsc -p tsconfig.mcp.json",
+    "dev:mcp": "tsx src/index.ts",
+    "start:mcp": "node dist/index.js",
+    "dev": "next dev --webpack",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --import tsx --test src/**/*.test.ts",
+    "audit:leaks": "node scripts/audit-leaks.mjs",
+    "audit:data": "node tests/audit/data-integrity.mjs",
+    "audit:pages": "playwright test --reporter=list",
+    "audit": "npm run audit:leaks && npm run audit:data && npm run audit:pages"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/identity": "^4.13.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@tanstack/react-query": "^5.99.0",
+    "@tanstack/react-table": "^8.21.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "csv-parse": "^6.2.1",
+    "next": "^16.2.4",
+    "openai": "^6.34.0",
+    "pg": "^8.20.0",
+    "postcss": "^8.5.10",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "recharts": "^3.8.1",
+    "tailwindcss": "^4.2.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.2",
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  }
+}
